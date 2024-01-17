@@ -4,6 +4,9 @@ import numpy as np
 
 
 class DataCleaning:
+
+    # clean user data. removes null values, errors with dates,
+    # incorrectly typed values and rows filled with the wrong information
     def clean_user_data(self):
         df = DataExtractor().read_rds_table("legacy_users")
         df["date_of_birth"] = pd.to_datetime(df["date_of_birth"], infer_datetime_format=True,
@@ -15,6 +18,7 @@ class DataCleaning:
 
         return df
 
+    # clean the data to remove any erroneous values, NULL values or errors with formatting
     def clean_card_data(self):
         df = DataExtractor().retrieve_pdf_data(
             "https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
@@ -34,6 +38,7 @@ class DataCleaning:
 
         return card_details
 
+    # cleans the data retrieve from the API and returns a pandas DataFrame.
     def clean_store_data(self):
         data = DataExtractor().retrieve_stores_data()
         data.replace({"continent": ["eeEurope", "eeAmerica"]}, {"continent": ["Europe", "America"]},
@@ -49,6 +54,7 @@ class DataCleaning:
 
         return data
 
+    # this will take the products DataFrame as an argument and return the products DataFrame.
     def convert_product_weights(self, products_df):
         products_df["weight"] = products_df["weight"].apply(str)
         products_df.replace({"weight": ["12 x 100g", "8 x 150g"]}, {"weight": ["1200g", "1200g"]}, inplace=True)
@@ -60,6 +66,7 @@ class DataCleaning:
         products_df.drop(columns="units", inplace=True)
         return products_df
 
+    # this method will clean the DataFrame of any additional erroneous values.
     def clean_products_data(self, products_dataframe):
         products_df = self.convert_product_weights(
             products_dataframe)
@@ -70,6 +77,8 @@ class DataCleaning:
 
         return products_df
 
+    # will clean the orders table data. remove the columns, first_name, last_name and 1 to have the table in the
+    # correct form before uploading to the database.
     def clean_orders_data(self):
         orders_df = DataExtractor().read_rds_table("orders_table")
         orders_df.drop(columns=["1", "first_name", "last_name", "level_0"], inplace=True)
