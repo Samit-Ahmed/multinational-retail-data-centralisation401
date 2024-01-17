@@ -3,11 +3,14 @@ import sqlalchemy
 
 
 class DatabaseConnector:
+
+    # read yaml file db_creds.yaml and return a dictionary
     def read_db_creds(self):
         with open('db_creds.yaml', 'r') as file:
             creds = yaml.safe_load(file)
         return creds
 
+    # read the credentials from the return of read_db_creds and initialise and return a sqlalchemy database engine.
     def init_db_engine(self):
         creds = self.read_db_creds()
 
@@ -23,6 +26,7 @@ class DatabaseConnector:
         engine = sqlalchemy.create_engine(db_conn_url)
         return engine
 
+    # list all the tables in the database
     def list_db_tables(self):
         engine = self.init_db_engine()
         with engine.connect() as conn:
@@ -33,6 +37,7 @@ class DatabaseConnector:
 
             return tables
 
+    # This method will take in a Pandas DataFrame and table name to upload to as an argument
     def upload_to_db(self, df, table_name):
         DATABASE_TYPE = 'postgresql'
         DBAPI = 'psycopg2'
